@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "../@/components/ui/table";
 
-export function TableDemo(invoices) {
+function TableDemo(invoices) {
   // console.log(typeof Array(invoices));
   return (
     <Table>
