@@ -1,4 +1,5 @@
 const axios = require("axios");
+import { cache } from "react";
 import {
   Table,
   TableBody,
@@ -20,6 +21,7 @@ function TableDemo(invoices) {
           <TableHead className="max-w-[40px]">Data</TableHead>
           <TableHead className="w-[100px]">Produto</TableHead>
           <TableHead>Nome</TableHead>
+          <TableHead>Email</TableHead>
           <TableHead>Método de Pagamento</TableHead>
           <TableHead className="text-right">Valor</TableHead>
           <TableHead className="text-right">Moeda</TableHead>
@@ -38,6 +40,7 @@ function TableDemo(invoices) {
                 {invoice.product.name}
               </TableCell>
               <TableCell>{invoice.buyer.name}</TableCell>
+              <TableCell>{invoice.buyer.email}</TableCell>
               <TableCell>{invoice.purchase.payment.type}</TableCell>
               <TableCell className="text-right">
                 {invoice.purchase.price.value}
@@ -164,17 +167,47 @@ export default async function Page() {
   }
 
   let leads = await convertStreamToObject(gsResponse);
-  console.log(leads[0]);
-
+  leads = leads.sort((a, b) => new Date(b[4]) - new Date(a[4]));
+  console.log(leads[1]);
   return (
     <>
       <div>
-        <ul>
-          {"ultimos leads"}
-          {leads.slice(1, 6).map((lead, i) => (
-            <li key={i}>{lead[2]}</li>
-          ))}
-        </ul>
+        <Table>
+          <TableCaption>Leads</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="max-w-[40px]">Nome</TableHead>
+              <TableHead className="max-w-[40px]">Email</TableHead>
+              <TableHead className="max-w-[40px]">Phone</TableHead>
+              <TableHead className="max-w-[40px]">tags</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {leads.slice(1, 20).map((lead, i) => {
+              const url = new URL("https://pv.lactoflow.com.br" + lead[6]);
+              const searchParams = url.searchParams;
+
+              // Convert the search parameters to an object
+              const paramsObject = {};
+
+              searchParams.forEach((value, key) => {
+                paramsObject[key] = value;
+              });
+              return (
+                <TableRow key={lead[0]}>
+                  <TableCell>{lead[2]}</TableCell>
+                  <TableCell>{lead[0]}</TableCell>
+                  <TableCell>{lead[1]}</TableCell>
+                  <TableCell>
+                    {paramsObject["utm_source"] +
+                      "-" +
+                      paramsObject["utm_adset"]}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
       </div>
       <TableDemo
         invoices={data.items.sort(
