@@ -22,6 +22,7 @@ function TableDemo(invoices) {
           <TableHead>Nome</TableHead>
           <TableHead>Método de Pagamento</TableHead>
           <TableHead className="text-right">Valor</TableHead>
+          <TableHead className="text-right">Moeda</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -40,6 +41,9 @@ function TableDemo(invoices) {
               <TableCell>{invoice.purchase.payment.type}</TableCell>
               <TableCell className="text-right">
                 {invoice.purchase.price.value}
+              </TableCell>
+              <TableCell className="text-right">
+                {invoice.purchase.price.currency_code}
               </TableCell>
             </TableRow>
           );
@@ -129,8 +133,49 @@ async function getData() {
 
 export default async function Page() {
   const data = await getData();
+  var gsResponse = await fetch(
+    "https://script.google.com/macros/s/AKfycbwIAj1HWYmqEeF7I_A3WfJGoshnPzSbQLDYir00RhgoWs1QsRj5nLAsEUIAGYuD7DfopQ/exec"
+  );
+  async function convertStreamToObject(response) {
+    // Create a new text decoder
+    const textDecoder = new TextDecoder("utf-8");
+
+    // Initialize an empty string to store the stream data
+    let data = "";
+
+    // Get a readable stream reader
+    const streamReader = response.body.getReader();
+
+    // Read the stream until it's done
+    while (true) {
+      const { done, value } = await streamReader.read();
+
+      // If the stream is done, break out of the loop
+      if (done) break;
+
+      // Convert the chunk of data to text and append to the 'data' string
+      data += textDecoder.decode(value);
+    }
+
+    // Parse the 'data' string into an object (assuming it contains JSON)
+    const resultObject = JSON.parse(data);
+
+    return resultObject;
+  }
+
+  let leads = await convertStreamToObject(gsResponse);
+  console.log(leads[0]);
+
   return (
     <>
+      <div>
+        <ul>
+          {"ultimos leads"}
+          {leads.slice(1, 6).map((lead, i) => (
+            <li key={i}>{lead[2]}</li>
+          ))}
+        </ul>
+      </div>
       <TableDemo
         invoices={data.items.sort(
           (a, b) => b.purchase.order_date - a.purchase.order_date
