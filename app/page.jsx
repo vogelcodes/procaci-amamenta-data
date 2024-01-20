@@ -1,4 +1,51 @@
 const axios = require("axios");
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../@/components/ui/table";
+
+export function TableDemo(invoices) {
+  // console.log(typeof Array(invoices));
+  return (
+    <Table>
+      <TableCaption>A list of your recent invoices.</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-[100px]">Invoice</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Method</TableHead>
+          <TableHead className="text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {invoices.invoices.map((invoice) => (
+          <TableRow key={invoice.product.id}>
+            <TableCell className="font-medium">
+              {invoice.product.name}
+            </TableCell>
+            <TableCell>{invoice.buyer.name}</TableCell>
+            <TableCell>{invoice.purchase.payment.type}</TableCell>
+            <TableCell className="text-right">
+              {invoice.purchase.price.value}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+      <TableFooter>
+        {/* <TableRow>
+          <TableCell colSpan={3}>Total</TableCell>
+          <TableCell className="text-right">$2,500.00</TableCell>
+        </TableRow> */}
+      </TableFooter>
+    </Table>
+  );
+}
 
 async function getData() {
   const clientId = process.env.CLIENT_ID;
@@ -60,7 +107,6 @@ async function getData() {
           `https://developers.hotmart.com/payments/api/v1/sales/history?max_results=${queryParams.max_results}&transaction_status=APPROVED,COMPLETE&start_date=${queryParams.start_date}&end_date=${queryParams.end_date}`,
           apiConfig
         );
-        console.log(payments.data);
       } catch (error) {
         console.error(error);
       }
@@ -70,12 +116,14 @@ async function getData() {
     return apiResponse;
   }
   const response = await init();
-  console.log(response);
   return response;
 }
 
 export default async function Page() {
   const data = await getData();
-  // console.log(data);
-  return <>{JSON.stringify(data)}</>;
+  return (
+    <>
+      <TableDemo invoices={data.items} />
+    </>
+  );
 }
