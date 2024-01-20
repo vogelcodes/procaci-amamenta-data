@@ -17,25 +17,33 @@ function TableDemo(invoices) {
       <TableCaption>A list of your recent invoices.</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">Invoice</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Method</TableHead>
-          <TableHead className="text-right">Amount</TableHead>
+          <TableHead className="max-w-[40px]">Data</TableHead>
+          <TableHead className="w-[100px]">Produto</TableHead>
+          <TableHead>Nome</TableHead>
+          <TableHead>Método de Pagamento</TableHead>
+          <TableHead className="text-right">Valor</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {invoices.invoices.map((invoice) => (
-          <TableRow key={invoice.product.id}>
-            <TableCell className="font-medium">
-              {invoice.product.name}
-            </TableCell>
-            <TableCell>{invoice.buyer.name}</TableCell>
-            <TableCell>{invoice.purchase.payment.type}</TableCell>
-            <TableCell className="text-right">
-              {invoice.purchase.price.value}
-            </TableCell>
-          </TableRow>
-        ))}
+        {invoices.invoices.map((invoice) => {
+          let purchaseDate = new Date(invoice.purchase.order_date);
+          let formatedDate = purchaseDate.toLocaleDateString("pt-BR");
+          return (
+            <TableRow key={invoice.product.id}>
+              <TableCell className="font-medium text-ellipsis">
+                {formatedDate}
+              </TableCell>
+              <TableCell className="font-medium text-center">
+                {invoice.product.name}
+              </TableCell>
+              <TableCell>{invoice.buyer.name}</TableCell>
+              <TableCell>{invoice.purchase.payment.type}</TableCell>
+              <TableCell className="text-right">
+                {invoice.purchase.price.value}
+              </TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
       <TableFooter>
         {/* <TableRow>
@@ -123,7 +131,11 @@ export default async function Page() {
   const data = await getData();
   return (
     <>
-      <TableDemo invoices={data.items} />
+      <TableDemo
+        invoices={data.items.sort(
+          (a, b) => b.purchase.order_date - a.purchase.order_date
+        )}
+      />
     </>
   );
 }
