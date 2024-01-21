@@ -137,7 +137,10 @@ async function getData() {
 export default async function Page() {
   const data = await getData();
   var gsResponse = await fetch(
-    "https://script.google.com/macros/s/AKfycbwIAj1HWYmqEeF7I_A3WfJGoshnPzSbQLDYir00RhgoWs1QsRj5nLAsEUIAGYuD7DfopQ/exec"
+    "https://script.google.com/macros/s/AKfycbwIAj1HWYmqEeF7I_A3WfJGoshnPzSbQLDYir00RhgoWs1QsRj5nLAsEUIAGYuD7DfopQ/exec",
+    {
+      next: { revalidate: 300 },
+    }
   );
   async function convertStreamToObject(response) {
     // Create a new text decoder
