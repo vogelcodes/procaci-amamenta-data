@@ -134,44 +134,44 @@ async function getData() {
   return response;
 }
 
-export default async function Page() {
-  const data = await getData();
-  var gsResponse = await fetch(
-    "https://script.google.com/macros/s/AKfycbwIAj1HWYmqEeF7I_A3WfJGoshnPzSbQLDYir00RhgoWs1QsRj5nLAsEUIAGYuD7DfopQ/exec",
-    {
-      next: { revalidate: 300 },
-    }
-  );
-  async function convertStreamToObject(response) {
-    // Create a new text decoder
-    const textDecoder = new TextDecoder("utf-8");
+const data = await getData();
+var gsResponse = await fetch(
+  "https://script.google.com/macros/s/AKfycbwIAj1HWYmqEeF7I_A3WfJGoshnPzSbQLDYir00RhgoWs1QsRj5nLAsEUIAGYuD7DfopQ/exec",
+  {
+    next: { revalidate: 300 },
+  }
+);
+async function convertStreamToObject(response) {
+  // Create a new text decoder
+  const textDecoder = new TextDecoder("utf-8");
 
-    // Initialize an empty string to store the stream data
-    let data = "";
+  // Initialize an empty string to store the stream data
+  let data = "";
 
-    // Get a readable stream reader
-    const streamReader = response.body.getReader();
+  // Get a readable stream reader
+  const streamReader = response.body.getReader();
 
-    // Read the stream until it's done
-    while (true) {
-      const { done, value } = await streamReader.read();
+  // Read the stream until it's done
+  while (true) {
+    const { done, value } = await streamReader.read();
 
-      // If the stream is done, break out of the loop
-      if (done) break;
+    // If the stream is done, break out of the loop
+    if (done) break;
 
-      // Convert the chunk of data to text and append to the 'data' string
-      data += textDecoder.decode(value);
-    }
-
-    // Parse the 'data' string into an object (assuming it contains JSON)
-    const resultObject = JSON.parse(data);
-
-    return resultObject;
+    // Convert the chunk of data to text and append to the 'data' string
+    data += textDecoder.decode(value);
   }
 
-  let leads = await convertStreamToObject(gsResponse);
-  leads = leads.sort((a, b) => new Date(b[4]) - new Date(a[4]));
-  console.log(leads[1]);
+  // Parse the 'data' string into an object (assuming it contains JSON)
+  const resultObject = JSON.parse(data);
+
+  return resultObject;
+}
+
+let leads = await convertStreamToObject(gsResponse);
+leads = leads.sort((a, b) => new Date(b[4]) - new Date(a[4]));
+console.log(leads[1]);
+export default async function Page() {
   return (
     <>
       <div>
