@@ -1,7 +1,7 @@
 export default async function Ads() {
   const metaAdsToken = process.env.META_ADS_TOKEN;
   let response = await fetch(
-    `https://graph.facebook.com/v17.0/act_182895559595801/insights?access_token=${metaAdsToken}&date_preset=last_7d&fields=campaign_name,spend,campaign_id&level=campaign&limit=120&pretty=0&time_increment=1`,
+    `https://graph.facebook.com/v17.0/act_182895559595801/insights?access_token=${metaAdsToken}&date_preset=last_7d&fields=campaign_name,spend,impressions&level=campaign&limit=120&pretty=0&time_increment=1`,
     { next: { revalidate: 3600 } }
   );
   let insights = await response.json();
